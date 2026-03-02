@@ -5,6 +5,8 @@ L'entreprise qui a développé le simulateur pour le compte de l'état a utilis�
 Backlog disponible [ici](USER_STORIES.md).
 
 Le système est exposé à l'aide d'une `API REST`.
+
+Le Swagger est disponible ici : [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
 ![API](img/api.webp)
 
 ## Nouveau Besoin
