@@ -7,8 +7,14 @@ public class Simulateur {
     private static final double[] TRANCHES_IMPOSITION = {10225, 26070, 74545, 160336};
     private static final double[] TAUX_IMPOSITION = {0.0, 0.11, 0.30, 0.41, 0.45};
 
-    public double calculerImpotsAnnuel(String situationFamiliale, double salaireMensuel, double salaireMensuelConjoint, int nombreEnfants) {
-        if (!"Célibataire".equals(situationFamiliale) && !"Marié/Pacsé".equals(situationFamiliale)) {
+    public double calculerImpotsAnnuel(String situationFamilialeString, double salaireMensuel, double salaireMensuelConjoint, int nombreEnfants) {
+        SituationFamiliale situationFamiliale;
+
+        if (situationFamilialeString.equals("Célibataire")) {
+            situationFamiliale = SituationFamiliale.CELIBATAIRE;
+        } else if (situationFamilialeString.equals("Marié/Pacsé")) {
+            situationFamiliale = SituationFamiliale.MARIE_PACSE;
+        } else {
             throw new IllegalArgumentException("Situation familiale invalide.");
         }
 
@@ -16,7 +22,7 @@ public class Simulateur {
             throw new IllegalArgumentException("Les salaires doivent être positifs.");
         }
 
-        if ("Marié/Pacsé".equals(situationFamiliale) && salaireMensuelConjoint < 0) {
+        if (situationFamiliale == SituationFamiliale.MARIE_PACSE && salaireMensuelConjoint < 0) {
             throw new IllegalStateException("Les salaires doivent être positifs.");
         }
 
@@ -24,11 +30,11 @@ public class Simulateur {
             throw new IllegalArgumentException("Le nombre d'enfants ne peut pas être négatif.");
         }
 
-        double revenuAnnuel = "Marié/Pacsé".equals(situationFamiliale) ?
+        double revenuAnnuel = situationFamiliale == SituationFamiliale.MARIE_PACSE ?
                 (salaireMensuel + salaireMensuelConjoint) * 12 :
                 salaireMensuel * 12;
 
-        int baseQuotient = "Marié/Pacsé".equals(situationFamiliale) ? 2 : 1;
+        int baseQuotient = situationFamiliale == SituationFamiliale.MARIE_PACSE ? 2 : 1;
         double quotientEnfants = 1.0 + (nombreEnfants - 2) * 0.5;
 
         double partsFiscales = baseQuotient + quotientEnfants;
