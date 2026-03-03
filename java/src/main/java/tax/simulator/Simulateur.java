@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 public class Simulateur {
     private static final double[] TRANCHES_IMPOSITION = {10225, 26070, 74545, 160336};
     private static final double[] TAUX_IMPOSITION = {0.0, 0.11, 0.30, 0.41, 0.45};
+    private static final int NOMBRE_MOIS = 12;
 
     public double calculerImpotsAnnuel(String situationFamilialeString, double salaireMensuel, double salaireMensuelConjoint, int nombreEnfants) {
         SituationFamiliale situationFamiliale;
@@ -33,8 +34,8 @@ public class Simulateur {
         }
 
         double revenuAnnuel = isMariePacse ?
-                (salaireMensuel + salaireMensuelConjoint) * 12 :
-                salaireMensuel * 12;
+                (salaireMensuel + salaireMensuelConjoint) * NOMBRE_MOIS :
+                salaireMensuel * NOMBRE_MOIS;
 
         int baseQuotient = isMariePacse ? 2 : 1;
         double quotientEnfants = 1.0 + (nombreEnfants - 2) * 0.5;
