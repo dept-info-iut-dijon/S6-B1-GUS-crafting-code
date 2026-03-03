@@ -45,11 +45,9 @@ public class Simulateur {
 
         double impot = 0;
         for (int i = 0; i < TRANCHES_IMPOSITION.length; i++) {
-            if (revenuImposableParPart <= TRANCHES_IMPOSITION[i]) {
-                impot += (revenuImposableParPart - (i > 0 ? TRANCHES_IMPOSITION[i - 1] : 0)) * TAUX_IMPOSITION[i];
-                break;
-            } else {
-                impot += (TRANCHES_IMPOSITION[i] - (i > 0 ? TRANCHES_IMPOSITION[i - 1] : 0)) * TAUX_IMPOSITION[i];
+            double montantTranche = Math.min(revenuImposableParPart, TRANCHES_IMPOSITION[i]) - (i > 0 ? TRANCHES_IMPOSITION[i - 1] : 0);
+            if (montantTranche > 0) {
+                impot += montantTranche * TAUX_IMPOSITION[i];
             }
         }
 
