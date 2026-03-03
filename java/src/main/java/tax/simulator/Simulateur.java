@@ -2,13 +2,32 @@ package tax.simulator;
 
 import org.springframework.stereotype.Service;
 
+/**
+ * Simulateur de calcul des impôts annuels
+ */
 @Service
 public class Simulateur {
     private static final double[] TRANCHES_IMPOSITION = {10225, 26070, 74545, 160336};
     private static final double[] TAUX_IMPOSITION = {0.0, 0.11, 0.30, 0.41, 0.45};
+    private static final int NOMBRE_MOIS = 12;
 
-    public double calculerImpotsAnnuel(String situationFamiliale, double salaireMensuel, double salaireMensuelConjoint, int nombreEnfants) {
-        if (!"Célibataire".equals(situationFamiliale) && !"Marié/Pacsé".equals(situationFamiliale)) {
+    /**
+     * Calcule les impôts annuels d'une personne
+     *
+     * @param situationFamilialeString situation familiale sous forme d'une chaîne de caractères
+     * @param salaireMensuel           salaire mensuel de la personne
+     * @param salaireMensuelConjoint   salaire mensuel du conjoint de la personne
+     * @param nombreEnfants            nombre d'enfants de la personne
+     * @return impôts annuels de la personne
+     */
+    public double calculerImpotsAnnuel(String situationFamilialeString, double salaireMensuel, double salaireMensuelConjoint, int nombreEnfants) {
+        SituationFamiliale situationFamiliale;
+
+        if (situationFamilialeString.equals("Célibataire")) {
+            situationFamiliale = SituationFamiliale.CELIBATAIRE;
+        } else if (situationFamilialeString.equals("Marié/Pacsé")) {
+            situationFamiliale = SituationFamiliale.MARIE_PACSE;
+        } else {
             throw new IllegalArgumentException("Situation familiale invalide.");
         }
 
@@ -16,7 +35,9 @@ public class Simulateur {
             throw new IllegalArgumentException("Les salaires doivent être positifs.");
         }
 
-        if ("Marié/Pacsé".equals(situationFamiliale) && salaireMensuelConjoint < 0) {
+        boolean isMariePacse = situationFamiliale == SituationFamiliale.MARIE_PACSE;
+
+        if (isMariePacse && salaireMensuelConjoint < 0) {
             throw new IllegalStateException("Les salaires doivent être positifs.");
         }
 
@@ -24,33 +45,21 @@ public class Simulateur {
             throw new IllegalArgumentException("Le nombre d'enfants ne peut pas être négatif.");
         }
 
-        double revenuAnnuel = "Marié/Pacsé".equals(situationFamiliale) ?
-                (salaireMensuel + salaireMensuelConjoint) * 12 :
-                salaireMensuel * 12;
+        double revenuAnnuel = isMariePacse ?
+                (salaireMensuel + salaireMensuelConjoint) * NOMBRE_MOIS :
+                salaireMensuel * NOMBRE_MOIS;
 
-        int baseQuotient = "Marié/Pacsé".equals(situationFamiliale) ? 2 : 1;
-        double quotientEnfants = Math.PI;
-
-        if (nombreEnfants == 0) {
-            quotientEnfants = 0;
-        } else if (nombreEnfants == 1) {
-            quotientEnfants = 0.5;
-        } else if (nombreEnfants == 2) {
-            quotientEnfants = 1.0;
-        } else {
-            quotientEnfants = 1.0 + (nombreEnfants - 2) * 0.5;
-        }
+        int baseQuotient = isMariePacse ? 2 : 1;
+        double quotientEnfants = 1.0 + (nombreEnfants - 2) * 0.5;
 
         double partsFiscales = baseQuotient + quotientEnfants;
         double revenuImposableParPart = revenuAnnuel / partsFiscales;
 
         double impot = 0;
         for (int i = 0; i < TRANCHES_IMPOSITION.length; i++) {
-            if (revenuImposableParPart <= TRANCHES_IMPOSITION[i]) {
-                impot += (revenuImposableParPart - (i > 0 ? TRANCHES_IMPOSITION[i - 1] : 0)) * TAUX_IMPOSITION[i];
-                break;
-            } else {
-                impot += (TRANCHES_IMPOSITION[i] - (i > 0 ? TRANCHES_IMPOSITION[i - 1] : 0)) * TAUX_IMPOSITION[i];
+            double montantTranche = Math.min(revenuImposableParPart, TRANCHES_IMPOSITION[i]) - (i > 0 ? TRANCHES_IMPOSITION[i - 1] : 0);
+            if (montantTranche > 0) {
+                impot += montantTranche * TAUX_IMPOSITION[i];
             }
         }
 

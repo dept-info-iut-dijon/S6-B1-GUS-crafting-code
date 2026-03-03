@@ -13,6 +13,9 @@ import java.util.Locale;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.within;
 
+/**
+ * Classe de tests d'intégration de l'API de calcul des impôts
+ */
 @SpringBootTest(classes = tax.simulator.TaxSimulatorApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class TaxApiTests {
     private final RestTemplate restTemplate = new RestTemplate();
