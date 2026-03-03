@@ -22,7 +22,9 @@ public class Simulateur {
             throw new IllegalArgumentException("Les salaires doivent être positifs.");
         }
 
-        if (situationFamiliale == SituationFamiliale.MARIE_PACSE && salaireMensuelConjoint < 0) {
+        boolean isMariePacse = situationFamiliale == SituationFamiliale.MARIE_PACSE;
+
+        if (isMariePacse && salaireMensuelConjoint < 0) {
             throw new IllegalStateException("Les salaires doivent être positifs.");
         }
 
@@ -30,11 +32,11 @@ public class Simulateur {
             throw new IllegalArgumentException("Le nombre d'enfants ne peut pas être négatif.");
         }
 
-        double revenuAnnuel = situationFamiliale == SituationFamiliale.MARIE_PACSE ?
+        double revenuAnnuel = isMariePacse ?
                 (salaireMensuel + salaireMensuelConjoint) * 12 :
                 salaireMensuel * 12;
 
-        int baseQuotient = situationFamiliale == SituationFamiliale.MARIE_PACSE ? 2 : 1;
+        int baseQuotient = isMariePacse ? 2 : 1;
         double quotientEnfants = 1.0 + (nombreEnfants - 2) * 0.5;
 
         double partsFiscales = baseQuotient + quotientEnfants;
