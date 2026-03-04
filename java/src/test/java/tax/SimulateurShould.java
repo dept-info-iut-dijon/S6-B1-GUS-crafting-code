@@ -1,7 +1,9 @@
 package tax;
 
 import org.junit.jupiter.api.Test;
-import tax.simulator.Simulateur;
+
+import tax.simulator.repository.BaremeRepositoryImpl;
+import tax.simulator.service.Simulateur;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -9,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Classe de tests unitaires de l'API de calcul des impôts
  */
 public class SimulateurShould {
-    private final Simulateur simulateur = new Simulateur();
+    private final Simulateur simulateur = new Simulateur(new BaremeRepositoryImpl());
 
     /**
      * Teste que la tranche d'imposition à 48% n'est pas appliquée pour les revenus inférieurs
