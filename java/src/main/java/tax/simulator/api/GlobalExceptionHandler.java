@@ -7,6 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import tax.simulator.api.error.ApiError;
+import tax.simulator.api.error.ApiErrorBuilder;
+import tax.simulator.api.error.ApiErrorBuilderImpl;
+
 import java.time.LocalDateTime;
 
 /**
@@ -24,13 +28,12 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiError> handleIllegalArgument(IllegalArgumentException ex) {
-        ApiError error = new ApiError(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                ex.getMessage()
-        );
-        return ResponseEntity.badRequest().body(error);
+        ApiErrorBuilder builder = new ApiErrorBuilderImpl();
+        builder.setTimestamp(LocalDateTime.now());
+        builder.setStatus(HttpStatus.BAD_REQUEST.value());
+        builder.setError(HttpStatus.BAD_REQUEST.getReasonPhrase());
+        builder.setMessage(ex.getMessage());
+        return ResponseEntity.badRequest().body(builder.build());
     }
 
     /**
@@ -42,12 +45,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleException(Exception ex) {
         logger.error("An unhandled exception occurred.", ex);
-        ApiError error = new ApiError(
-                LocalDateTime.now(),
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                "An unexpected error occurred: " + ex.getMessage()
-        );
-        return ResponseEntity.internalServerError().body(error);
+        ApiErrorBuilder builder = new ApiErrorBuilderImpl();
+        builder.setTimestamp(LocalDateTime.now());
+        builder.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        builder.setError(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+        builder.setMessage("An unexpected error occurred: " + ex.getMessage());
+        return ResponseEntity.internalServerError().body(builder.build());
     }
 }
