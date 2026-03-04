@@ -40,17 +40,13 @@ public class TaxController {
             @RequestParam double salaireMensuel,
             @RequestParam double salaireMensuelConjoint,
             @RequestParam int nombreEnfants) {
-        try {
-            return ResponseEntity.ok(
-                    calculImpotService.calculerImpotsAnnuel(
-                            situationFamiliale,
-                            salaireMensuel,
-                            salaireMensuelConjoint,
-                            nombreEnfants
-                    )
-            );
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
+        return ResponseEntity.ok(
+                calculImpotService.calculerImpotsAnnuel(
+                        situationFamiliale,
+                        salaireMensuel,
+                        salaireMensuelConjoint,
+                        nombreEnfants
+                )
+        );
     }
 }
