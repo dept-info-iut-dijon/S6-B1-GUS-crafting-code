@@ -23,10 +23,21 @@ class TaxApiTests {
     @LocalServerPort
     private int port;
 
+    /**
+     * Teste que l'API de calcul des impôts retourne le résultat attendu pour différentes situations familiales, salaires et nombre d'enfants.
+     * @param situationFamiliale Situation familiale de la personne (Célibataire ou Marié/Pacsé)
+     * @param salaireMensuel Salaire mensuel de la personne
+     * @param salaireMensuelConjoint Salaire mensuel du conjoint de la personne (0 si célibataire)
+     * @param nombreEnfants Nombre d'enfants de la personne
+     * @param expectedResult Résultat attendu du calcul des impôts annuels
+     */
     @ParameterizedTest
     @CsvSource({
             "Célibataire, 2000, 0, 0, 1515.25",
-            "Marié/Pacsé, 3000, 3000, 3, 3983.37"
+            "Marié/Pacsé, 3000, 3000, 3, 3983.37",
+            "Célibataire, 20000, 0, 0, 87308.56",
+            "Célibataire, 45000, 0, 0, 223508.56",
+            "Marié/Pacsé, 30000, 25000, 2, 234925.68"
     })
     void calculateTax_ReturnsOkStatusCode(String situationFamiliale, double salaireMensuel, double salaireMensuelConjoint, int nombreEnfants, double expectedResult) {
         var url = formatUrl(situationFamiliale, salaireMensuel, salaireMensuelConjoint, nombreEnfants);
@@ -35,6 +46,13 @@ class TaxApiTests {
         assertThat(response).isCloseTo(expectedResult, within(0.01));
     }
 
+    /**
+     * Teste que l'API de calcul des impôts retourne un code d'erreur 400 Bad Request pour des entrées invalides, telles que des salaires négatifs ou un nombre d'enfants négatif.
+     * @param situationFamiliale Situation familiale de la personne (Célibataire ou Marié/Pacsé)
+     * @param salaireMensuel Salaire mensuel de la personne
+     * @param salaireMensuelConjoint Salaire mensuel du conjoint de la personne (0 si célibataire)
+     * @param nombreEnfants Nombre d'enfants de la personne
+     */
     @ParameterizedTest
     @CsvSource({
             "Célibataire, -1000, 0, 0",

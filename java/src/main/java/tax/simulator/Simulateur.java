@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class Simulateur {
-    private static final double[] TRANCHES_IMPOSITION = {10225, 26070, 74545, 160336};
-    private static final double[] TAUX_IMPOSITION = {0.0, 0.11, 0.30, 0.41, 0.45};
+    private static final double[] TRANCHES_IMPOSITION = {10225, 26070, 74545, 160336, 500000};
+    private static final double[] TAUX_IMPOSITION = {0.0, 0.11, 0.30, 0.41, 0.45, 0.48};
     private static final int NOMBRE_MOIS = 12;
 
     /**
