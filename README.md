@@ -1,4 +1,8 @@
 # Simulateur
+
+## Choix technique et amélioration continue
+Cette section est disponible dans le fichier [`Projet.md`](https://github.com/dept-info-iut-dijon/S6-B1-GUS-crafting-code/blob/main/Projet.md).
+
 ## User Stories
 L'entreprise qui a développé le simulateur pour le compte de l'état a utilisé le backlog suivant pour avancer sur ce logiciel.
 
