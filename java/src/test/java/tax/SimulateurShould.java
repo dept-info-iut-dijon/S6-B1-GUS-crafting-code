@@ -156,4 +156,74 @@ public class SimulateurShould {
         }
     }
 
+    /**
+     * Testes des cas limites pour vérifier que les calculs d'impôts sont corrects aux seuils
+     * des différentes tranches d'imposition, ainsi que pour des revenus très élevés.
+     */
+    @Nested
+    class CasLimitesCalcul {
+
+        /**
+         * Un revenu annuel dans la première tranche (≤ 10 225 EUR) doit donner 0 d'impôt (taux 0%).
+         * Salaire mensuel : 852 EUR → revenu annuel : 10 224 EUR (sous le seuil de 10 225).
+         */
+        @Test
+        void revenu_dans_premiere_tranche_impot_zero() {
+            double impot = simulateur.calculerImpotsAnnuel("Célibataire", 852, 0, 0);
+            assertThat(impot).isEqualTo(0.0);
+        }
+
+        /**
+         * Un très petit salaire juste au-dessus du seuil de la première tranche.
+         * Salaire mensuel : 853 EUR → revenu annuel : 10 236 EUR.
+         * Seul le montant au-dessus de 10 225 est imposé à 11%.
+         */
+        @Test
+        void revenu_juste_au_dessus_premiere_tranche() {
+            double impot = simulateur.calculerImpotsAnnuel("Célibataire", 853, 0, 0);
+            // (10236 - 10225) * 0.11 = 11 * 0.11 = 1.21
+            assertThat(impot).isEqualTo(1.21);
+        }
+
+        /**
+         * Revenu exactement au seuil de la première tranche (10 225 EUR).
+         * Salaire mensuel exact : 10225 / 12 ≈ 852.083...
+         * On utilise un salaire qui donne pile 10225 annuel.
+         */
+        @Test
+        void revenu_exactement_au_seuil_premiere_tranche() {
+            // 10225 / 12 n'est pas entier, on vérifie un cas très proche
+            double salaireMensuel = 10225.0 / 12.0;
+            double impot = simulateur.calculerImpotsAnnuel("Célibataire", salaireMensuel, 0, 0);
+            assertThat(impot).isEqualTo(0.0);
+        }
+
+        /**
+         * Un salaire modéré de 2000 EUR/mois (célibataire, sans enfant).
+         * Revenu annuel : 24 000 EUR. Résultat attendu : 1 515.25 EUR.
+         */
+        @Test
+        void salaire_moyen_celibataire_sans_enfant() {
+            double impot = simulateur.calculerImpotsAnnuel("Célibataire", 2000, 0, 0);
+            assertThat(impot).isEqualTo(1515.25);
+        }
+
+        /**
+         * Revenu très élevé pour tester la tranche à 48%.
+         * Salaire mensuel : 100 000 EUR → revenu annuel : 1 200 000 EUR.
+         */
+        @Test
+        void revenu_tres_eleve_tranche_48_pourcent() {
+            double impot = simulateur.calculerImpotsAnnuel("Célibataire", 100000, 0, 0);
+            // Calcul attendu :
+            // Tranche 0% :       0 - 10 225     → 0
+            // Tranche 11% :  10 225 - 26 070     → 15 845 * 0.11 = 1 742.95
+            // Tranche 30% :  26 070 - 74 545     → 48 475 * 0.30 = 14 542.50
+            // Tranche 41% :  74 545 - 160 336    → 85 791 * 0.41 = 35 174.31
+            // Tranche 45% : 160 336 - 500 000    → 339 664 * 0.45 = 152 848.80
+            // Tranche 48% : 500 000 - 1 200 000  → 700 000 * 0.48 = 336 000.00
+            // Total ≈ 540 308.56
+            assertThat(impot).isEqualTo(540308.56);
+        }
+    }
 }
