@@ -3,9 +3,9 @@ package tax.simulator.service;
 import org.springframework.stereotype.Service;
 
 import tax.simulator.model.BaremeFiscal;
-import tax.simulator.service.strategy.CalculFamilialStrategy;
-import tax.simulator.service.strategy.CelibataireStrategy;
-import tax.simulator.service.strategy.MariePacseStrategy;
+import tax.simulator.service.strategy.ICalculFamilialStrategy;
+import tax.simulator.service.strategy.CelibataireStrategyI;
+import tax.simulator.service.strategy.MariePacseStrategyI;
 
 /**
  * Implémentation du service de calcul des impôts annuels.
@@ -13,18 +13,23 @@ import tax.simulator.service.strategy.MariePacseStrategy;
  * <p>
  * Utilise le pattern Strategy pour déléguer les règles variant selon la
  * situation familiale (revenu, quotient, validation) à des stratégies
- * spécialisées ({@link CelibataireStrategy}, {@link MariePacseStrategy}).
+ * spécialisées ({@link CelibataireStrategyI}, {@link MariePacseStrategyI}).
  * <p>
  * La couche métier ne connaît pas la source des données fiscales : elle délègue
- * leur récupération au {@link BaremeRepository} (principe DIP).
+ * leur récupération au {@link IBaremeRepository} (principe DIP).
  */
 @Service
-public class Simulateur implements CalculImpotService {
+public class Simulateur implements ICalculImpotService {
 
-    private final BaremeRepository baremeRepository;
+    private final IBaremeRepository _iBaremeRepository;
 
-    public Simulateur(BaremeRepository baremeRepository) {
-        this.baremeRepository = baremeRepository;
+    /**
+     * Constructeur du service.
+     *
+     * @param _iBaremeRepository dépôt de barème
+     */
+    public Simulateur(IBaremeRepository _iBaremeRepository) {
+        this._iBaremeRepository = _iBaremeRepository;
     }
 
     /**
@@ -32,7 +37,7 @@ public class Simulateur implements CalculImpotService {
      */
     @Override
     public double calculerImpotsAnnuel(String situationFamilialeString, double salaireMensuel, double salaireMensuelConjoint, int nombreEnfants) {
-        CalculFamilialStrategy strategy = getStrategy(situationFamilialeString);
+        ICalculFamilialStrategy strategy = getStrategy(situationFamilialeString);
 
         strategy.validerSalaires(salaireMensuel, salaireMensuelConjoint);
         validerNombreEnfants(nombreEnfants);
@@ -46,15 +51,13 @@ public class Simulateur implements CalculImpotService {
         return Math.round(impot * partsFiscales * 100.0) / 100.0;
     }
 
-    // --- Méthodes privées (SRP : chaque méthode a une seule responsabilité) ---
-
     /**
      * Retourne la stratégie de calcul familial correspondant à la situation.
      */
-    private CalculFamilialStrategy getStrategy(String situationFamiliale) {
+    private ICalculFamilialStrategy getStrategy(String situationFamiliale) {
         return switch (situationFamiliale) {
-            case "Célibataire" -> new CelibataireStrategy();
-            case "Marié/Pacsé" -> new MariePacseStrategy();
+            case "Célibataire" -> new CelibataireStrategyI();
+            case "Marié/Pacsé" -> new MariePacseStrategyI();
             default -> throw new IllegalArgumentException("Situation familiale invalide.");
         };
     }
@@ -66,7 +69,7 @@ public class Simulateur implements CalculImpotService {
     }
 
     private double calculerImpotParPart(double revenuImposableParPart) {
-        BaremeFiscal bareme = baremeRepository.getBareme();
+        BaremeFiscal bareme = _iBaremeRepository.getBareme();
         double[] tranches = bareme.tranches();
         double[] taux = bareme.taux();
 

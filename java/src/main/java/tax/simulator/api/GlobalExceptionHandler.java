@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import tax.simulator.api.error.ApiError;
-import tax.simulator.api.error.ApiErrorBuilder;
+import tax.simulator.api.error.IApiErrorBuilder;
 import tax.simulator.api.error.ApiErrorBuilderImpl;
 
 import java.time.LocalDateTime;
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final Logger _logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     /**
      * Gère les erreurs de validation (paramètres invalides).
@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiError> handleIllegalArgument(IllegalArgumentException ex) {
-        ApiErrorBuilder builder = new ApiErrorBuilderImpl();
+        IApiErrorBuilder builder = new ApiErrorBuilderImpl();
         builder.setTimestamp(LocalDateTime.now());
         builder.setStatus(HttpStatus.BAD_REQUEST.value());
         builder.setError(HttpStatus.BAD_REQUEST.getReasonPhrase());
@@ -44,8 +44,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleException(Exception ex) {
-        logger.error("An unhandled exception occurred.", ex);
-        ApiErrorBuilder builder = new ApiErrorBuilderImpl();
+        _logger.error("An unhandled exception occurred.", ex);
+        IApiErrorBuilder builder = new ApiErrorBuilderImpl();
         builder.setTimestamp(LocalDateTime.now());
         builder.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         builder.setError(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());

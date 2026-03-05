@@ -5,24 +5,24 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import tax.simulator.service.CalculImpotService;
+import tax.simulator.service.ICalculImpotService;
 
 /**
  * Contrôleur REST pour le calcul des impôts.
- * Dépend de l'interface {@link CalculImpotService} et non d'une implémentation concrète (DIP).
+ * Dépend de l'interface {@link ICalculImpotService} et non d'une implémentation concrète (DIP).
  */
 @RestController
 @RequestMapping("/api/tax")
 public class TaxController {
-    private final CalculImpotService calculImpotService;
+    private final ICalculImpotService _iCalculImpotService;
 
     /**
      * Constructeur du contrôleur.
      *
-     * @param calculImpotService service de calcul des impôts
+     * @param _iCalculImpotService service de calcul des impôts
      */
-    public TaxController(CalculImpotService calculImpotService) {
-        this.calculImpotService = calculImpotService;
+    public TaxController(ICalculImpotService _iCalculImpotService) {
+        this._iCalculImpotService = _iCalculImpotService;
     }
 
     /**
@@ -41,7 +41,7 @@ public class TaxController {
             @RequestParam double salaireMensuelConjoint,
             @RequestParam int nombreEnfants) {
         return ResponseEntity.ok(
-                calculImpotService.calculerImpotsAnnuel(
+                _iCalculImpotService.calculerImpotsAnnuel(
                         situationFamiliale,
                         salaireMensuel,
                         salaireMensuelConjoint,
